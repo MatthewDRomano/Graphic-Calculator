@@ -5,7 +5,7 @@ import javax.swing.*;
 public class Graph extends JPanel {
     //fix Zoom / make the functions either variable / enum or user inputted
     private final int WIDTH = 400, HEIGHT = 400;
-    public static double zoomFactor = 1;// chanage window?  zoom changes 400*400 to wtv
+    private static double zoomFactor = 1;// chanage window?  zoom changes 400*400 to wtv
     private Point distanceDragged; 
     private Point offset; //  x = 0  is center so offset ensures graph has negative values       
     private Integer[] yCoords; 
@@ -16,12 +16,13 @@ public class Graph extends JPanel {
         yCoords = new Integer[WIDTH];
         distanceDragged = new Point(0,-0);
         calculateYVals(); 
-        repaint();
+
         // System.out.print(Integral(0, 1));     
         //System.out.println(Derivative(5.0));
         addMouseListener(ma);
         addMouseMotionListener(ma);
         addMouseWheelListener(ma);
+        repaint();
     }
 
     public void calculateYVals() {
@@ -32,8 +33,8 @@ public class Graph extends JPanel {
         for (int i = 0; i < WIDTH; i++) {
             double y, x = (int)(-offset.x+distanceDragged.x) + i;   
             x = x / zoomFactor; //if window goes from -10 to 10 down to -1 to 1, zoom is x10 AKA / 10   
-            y = Functions.Line(x, 0, 0);
-            yCoords[i] = (Double.isNaN(y)) ? null : (int)((y - (distanceDragged.y*zoomFactor) + (offset.y*zoomFactor)) / zoomFactor); 
+            y = Functions.Parabola(x, 0, 0); // shifts must be affected by zoomFactor too
+            yCoords[i] = (Double.isNaN(y)) ? null : (int)((y - (distanceDragged.y/zoomFactor) + (offset.y/zoomFactor)) * zoomFactor); 
             //System.out.println(x + " " + yCoords[i]);
         }
     }
@@ -61,14 +62,18 @@ public class Graph extends JPanel {
         //g2.setStroke(new BasicStroke(1/(float)zoomFactor));
         g2.drawLine(WIDTH/2-distanceDragged.x, 0, WIDTH/2-distanceDragged.x, HEIGHT);
         g2.drawLine(0, HEIGHT/2+distanceDragged.y, WIDTH, HEIGHT/2+distanceDragged.y);
-
-        //draw tiny lines
-        for (int i = 0; i < WIDTH; i++) {
-            if (i % 10 == 0) {
-                g2.drawLine(i-distanceDragged.x%10, offset.y+distanceDragged.y-5, i-distanceDragged.x%10, offset.y+distanceDragged.y+5);
-                g2.drawLine(offset.x-distanceDragged.x-5, i+distanceDragged.y%10, offset.x-distanceDragged.x+5, i+distanceDragged.y%10);
-            }          
-        }
+        
+        //draw tiny lines - must be centered from origin
+        int interval = (int)(10*zoomFactor);
+        for (int i = 0; i < WIDTH/2; i++)
+            if (i % interval == 0) {
+                g2.drawLine(offset.x+(i-distanceDragged.x%interval), offset.y+distanceDragged.y-3, offset.x+(i-distanceDragged.x%interval), offset.y+distanceDragged.y+3);
+                g2.drawLine(offset.x-distanceDragged.x-3, offset.y+(i+distanceDragged.y%interval), offset.x-distanceDragged.x+3, offset.y+(i+distanceDragged.y%interval));
+                i *= -1;
+                g2.drawLine(offset.x+(i-distanceDragged.x%interval), offset.y+distanceDragged.y-3, offset.x+(i-distanceDragged.x%interval), offset.y+distanceDragged.y+3);
+                g2.drawLine(offset.x-distanceDragged.x-3, offset.y+(i+distanceDragged.y%interval), offset.x-distanceDragged.x+3, offset.y+(i+distanceDragged.y%interval));
+                i *= -1;
+            }
 
         //draw Equation
         g2.setColor(Color.red);
@@ -102,7 +107,8 @@ public class Graph extends JPanel {
         }
         @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
-            //zoomFactor = (e.getWheelRotation() < 0) ? zoomFactor/1.1 : zoomFactor*1.1;;
+            zoomFactor = (e.getWheelRotation() < 0) ? zoomFactor/1.1 : zoomFactor*1.1;
+            zoomFactor = (zoomFactor < 0.1) ? 0.1 : zoomFactor;
             calculateYVals();
             repaint();
         }
