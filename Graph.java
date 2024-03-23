@@ -1,11 +1,9 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import java.util.*;
-
 
 public class Graph extends JPanel {
-    //make the functions either variable / enum or user inputted
+    //fix Zoom / make the functions either variable / enum or user inputted
     private final int WIDTH = 400, HEIGHT = 400;
     public static double zoomFactor = 1;// chanage window?  zoom changes 400*400 to wtv
     private Point distanceDragged; 
@@ -18,7 +16,9 @@ public class Graph extends JPanel {
         yCoords = new Integer[WIDTH];
         distanceDragged = new Point(0,-0);
         calculateYVals(); 
-        //System.out.print(Integral(0, 1));     
+        repaint();
+        // System.out.print(Integral(0, 1));     
+        //System.out.println(Derivative(5.0));
         addMouseListener(ma);
         addMouseMotionListener(ma);
         addMouseWheelListener(ma);
@@ -30,19 +30,27 @@ public class Graph extends JPanel {
         // }
         //OR
         for (int i = 0; i < WIDTH; i++) {
-            double x = (int)(-offset.x+distanceDragged.x) + i;   
-            x = x / zoomFactor; //if window goes from -10 to 10 down to -1 to 1, zoom is x10 AKA / 10       
-            yCoords[i] = (int)(((Functions.ThirdDegree(x, 0, 0)) - distanceDragged.y*zoomFactor + offset.y*zoomFactor)/zoomFactor);    
+            double y, x = (int)(-offset.x+distanceDragged.x) + i;   
+            x = x / zoomFactor; //if window goes from -10 to 10 down to -1 to 1, zoom is x10 AKA / 10   
+            y = Functions.Line(x, 0, 0);
+            yCoords[i] = (Double.isNaN(y)) ? null : (int)((y - (distanceDragged.y*zoomFactor) + (offset.y*zoomFactor)) / zoomFactor); 
+            //System.out.println(x + " " + yCoords[i]);
         }
     }
+    
+    public double Derivative(double x) {
+        double deltaX = 0.00001;
+        return (Functions.Parabola(x+deltaX, 0, 0) - Functions.Parabola(x, 0, 0))/deltaX;
+    }
     // public double Integral(int a, int b) {
-    //     //if statement to use simpsons rule if log based / trig function
-    //     double deltaX = 0.001;
+    //     //if statement to use simpsons rule if not log based / trig function
+    //     double deltaX = 0.1;
     //     double ans = 0;
     //     for (; a < b; a += deltaX)
     //         ans += Functions.Line(a, 0, 0) + Functions.Line(a + deltaX, 0, 0);
     //     return ans * 0.5 * deltaX;
     // }
+
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
@@ -65,10 +73,10 @@ public class Graph extends JPanel {
         //draw Equation
         g2.setColor(Color.red);
         for (int x = 0; x < WIDTH-1; x++) {
-            if (yCoords[x] != null && yCoords[x+1] != null) {
+            if (yCoords[x] == null || yCoords[x+1] == null) continue;
                 //System.out.println(yCoords[x] - offset.y + distanceDragged.y + " ");
                 g2.drawLine(x, HEIGHT-yCoords[x], x+1, HEIGHT-yCoords[x+1]);//on screen coords
-            }     
+            
         }                          
     }
 
@@ -94,7 +102,7 @@ public class Graph extends JPanel {
         }
         @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
-            zoomFactor = (e.getWheelRotation() < 0) ? zoomFactor/1.1 : zoomFactor*1.1;;
+            //zoomFactor = (e.getWheelRotation() < 0) ? zoomFactor/1.1 : zoomFactor*1.1;;
             calculateYVals();
             repaint();
         }
