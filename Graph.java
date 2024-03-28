@@ -2,35 +2,54 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.lang.reflect.*;
-
+//https://stackoverflow.com/questions/20366327/get-only-public-methods-of-a-class-using-java-reflection
 public class Graph extends JPanel { // make trig view
     private final int WIDTH = 350, HEIGHT = 300;
     private static double zoomFactor = 10; // changes window size (in calculations)
     private Point offset, distanceDragged;  //  x = 0  is center so offset ensures graph has negative values // drag is distance mouse drags      
     private Integer[] yCoords; 
-    //Method f = Functions.class.getMethod("Parabola");
+    private Method function; 
 
     public Graph() {
         setBounds(17, 17, WIDTH, HEIGHT);
         offset = new Point(WIDTH/2,HEIGHT/2);
         yCoords = new Integer[WIDTH];
         distanceDragged = new Point(0,0);
+        Functions.updateFunction("Parab");
+        updateFunction("Parab");
         calculateYVals(); 
 
         addMouseListener(ma);
         addMouseMotionListener(ma);
-        addMouseWheelListener(ma);
-        repaint();     
+        addMouseWheelListener(ma);          
     }
 
     public void calculateYVals() {
-        
         for (int i = 0; i < WIDTH; i++) {
-            double y, x = (int)(-offset.x-distanceDragged.x) + i;   
+            double y = Double.NaN, x = (int)(-offset.x-distanceDragged.x) + i;   
             x = x / zoomFactor; //if window goes from -10 to 10 down to -1 to 1, zoom is x10 AKA / 10   
-            y = Functions.Rocket(x, 0, 0);
+            //y = f(x, 0, 0);
+            try { y = (Double)function.invoke(null, x, 0d, 0d); }//double, double, double // null since static (no instance of Functions)
+            catch (IllegalAccessException e) { e.printStackTrace(); } 
+            catch (InvocationTargetException e) { e.printStackTrace(); } 
             yCoords[i] = (Double.isNaN(y)) ? null : (int)((y + (distanceDragged.y/zoomFactor) + (offset.y/zoomFactor)) * zoomFactor); 
         }
+        repaint();
+    }
+    public void updateFunction(String funcName) {
+        //Object ans = Double.NaN;
+        try {
+            function = Functions.class.getMethod(funcName, double.class, double.class, double.class); // Class<?>[] {arg1.class, arg2.class...} works too
+            //ans = function.invoke(null, 415.8d, 45.8d, 45.8d);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } 
+        catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        calculateYVals();
     }
 
     @Override
@@ -53,12 +72,12 @@ public class Graph extends JPanel { // make trig view
                 g2.drawLine(offset.x+distanceDragged.x-3, offset.y+(j-distanceDragged.y%interval), offset.x+distanceDragged.x+3, offset.y+(j-distanceDragged.y%interval));
             }
             
-        //draw Equation
+        //draw Equation (MAKE OWN METHOD TO EXPLAIN FOR APSCP TEST)
         g2.setColor(Color.red);
         for (int x = 0; x < WIDTH-1; x++) {
             if (yCoords[x] == null || yCoords[x+1] == null) continue;
                 g2.drawLine(x, HEIGHT-yCoords[x], x+1, HEIGHT-yCoords[x+1]);//on screen coords        
-        }                          
+        }
     }
 
     MouseAdapter ma = new MouseAdapter() {
@@ -78,7 +97,6 @@ public class Graph extends JPanel { // make trig view
             distanceDragged.y += curCoords.y - startCoords.y;
 
             calculateYVals();
-            repaint();
         }
         @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
@@ -86,7 +104,6 @@ public class Graph extends JPanel { // make trig view
             zoomFactor = (e.getWheelRotation() > 0) ? zoomFactor/1.1 : zoomFactor*1.1;
             zoomFactor = (zoomFactor < 0.5) ? 0.5 : zoomFactor; //0.5 cuz interval variable in paint component
             calculateYVals();
-            repaint();
         }
     };
 }
