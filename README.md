@@ -25,9 +25,7 @@ Java - VsCode
 |  Mouse Drag  | Move around screen  |
 |  Scroll Wheel Up  |   Zoom in   |
 |  Scroll Wheel Down  | Zoom out |
-| --- | -------- |
 | **On Screen Input** |
-| --- | -------- |
 |  Derivative Button  |   Calculates Derivative  |
 |  Integral Button  |   Calculates Integral  |
 |  Right Arrow Button  |Traces Right on Graph|
