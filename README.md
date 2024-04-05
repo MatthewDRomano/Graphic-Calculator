@@ -14,9 +14,9 @@ Java - VsCode
 - [x] Zoom in/out capability
 - [x] Adjustable graphing window via mouse drag
 - [x] Derivate at a point / Definite Integral Calculation
-- [ ] Reimann Sum Visual
+- [x] Reimann Sum Visual
 - [ ] Derivative Tangent Line 
-- [ ] Arrow Keys to trace graph
+- [x] Arrow Keys to trace graph
 - [ ] Trig view
 
 ## Controls
