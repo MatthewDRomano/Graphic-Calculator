@@ -16,7 +16,7 @@ Java - VsCode
 - [x] Reimann Sum Visual
 - [x] Derivative Tangent Line 
 - [x] Arrow Keys to trace graph
-- [ ] Ability to Graph Multiple Functions 
+- [ ] Ability to Graph Multiple Functions Simultaneously
 
 ## Controls
 | Key | Function |
