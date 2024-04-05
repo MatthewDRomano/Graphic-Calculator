@@ -1,15 +1,17 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
-import java.lang.reflect.*;
+import java.awt.geom.Point2D;
 
+import javax.swing.*;
 public class Graph extends JPanel {
     private final int WIDTH = 350, HEIGHT = 300, DEFAULTZOOM = 10;
-    private static double zoomFactor; // changes window size (in calculations) (Do zoom.x and zoom.y for trig)
+    private static double zoomFactor; //if window goes from -10 to 10 down to -1 to 1, zoom is x10 AKA / 10   
     private Point offset, distanceDragged;  //  x = 0  is center so offset ensures graph has negative values // drag is distance mouse drags      
     private Integer[] yCoords;
-    public Integer derivativePoint = null;
+    public double derivativePoint;
     public Double[] riemannRange;
+    public Point2D.Double tracePosition;
+    public boolean showTrace;
 
     public Graph() {
         setBounds(17, 17, WIDTH, HEIGHT);
@@ -17,25 +19,43 @@ public class Graph extends JPanel {
 
         addMouseListener(ma);
         addMouseMotionListener(ma);
-        addMouseWheelListener(ma);   
-        resetScreen();       
+        addMouseWheelListener(ma);
+        resetScreen();
     }
     public void resetScreen() {
         offset = new Point(WIDTH/2,HEIGHT/2);
         distanceDragged = new Point(0,0);
         zoomFactor = DEFAULTZOOM;
         riemannRange = new Double[] {Double.NaN, Double.NaN};
+        derivativePoint = Double.NaN;
+        tracePosition = new Point2D.Double(0, 0);
+        showTrace = false;
 
         calculateYVals();
     }
 
+    public double convertGraphToScreenCoord(Double graphCoord, boolean isXVal) {
+        if (graphCoord == null) return Double.NaN; 
+        else return (isXVal)
+            ? (graphCoord*zoomFactor) + offset.x + distanceDragged.x
+            : (graphCoord*zoomFactor) + offset.y + distanceDragged.y;
+    }
+    public double convertScreenToGraphCoord(int scrnCoord, boolean isXVal) {
+        return (isXVal)
+            ? (scrnCoord - offset.x - distanceDragged.x)/zoomFactor
+            : (scrnCoord - offset.y - distanceDragged.y)/zoomFactor;
+    }
+
     public void calculateYVals() {
         for (int i = 0; i < WIDTH; i++) {
-            double y, x = (int)(-offset.x-distanceDragged.x) + i;   //y can be Double.NaN too
-            x = x / zoomFactor; //if window goes from -10 to 10 down to -1 to 1, zoom is x10 AKA / 10   
-            y = Functions.f(x, 0, 0); 
-            yCoords[i] = (Double.isNaN(y)) ? null : (int)((y*zoomFactor + (distanceDragged.y) + (offset.y))); 
+            double y, x = convertScreenToGraphCoord(i, true);
+            y = Functions.f(x);  
+            yCoords[i] = (Double.isNaN(y)) ? null : (int)convertGraphToScreenCoord(y, false); // graph to screen
         }
+        int x = (int)convertGraphToScreenCoord(tracePosition.x, true);//graph to screen
+        if (x >= 0 && x < WIDTH && yCoords[x] != null)
+            tracePosition.y = HEIGHT-yCoords[x];
+        else tracePosition.y = Integer.MAX_VALUE;
         repaint();
     }
 
@@ -59,19 +79,39 @@ public class Graph extends JPanel {
                 g2.drawLine(offset.x+distanceDragged.x-3, offset.y+(j-distanceDragged.y%interval), offset.x+distanceDragged.x+3, offset.y+(j-distanceDragged.y%interval));
             }
 
-        //draw Equation (MAKE OWN METHOD TO EXPLAIN FOR APCSP TEST)
         g2.setColor(Color.red);
         for (int i = 0; i < WIDTH-1; i++) {
             if (yCoords[i] == null || yCoords[i+1] == null) continue;
             g2.drawLine(i, HEIGHT-yCoords[i], i+1, HEIGHT-yCoords[i+1]);//on screen coords   
             // BELOW Riemann Sum Visual
-            double x = (i - offset.x - distanceDragged.x)/zoomFactor;
+            double x = convertScreenToGraphCoord(i, true);//screen to graph
             if (x > riemannRange[0] && x < riemannRange[1])
                 g2.drawLine(i, HEIGHT-yCoords[i], i, offset.y - distanceDragged.y);
         }
-    }
+        
+        //draw derivative tanget line
+        double tangentPointX = convertGraphToScreenCoord(derivativePoint, true); // graph to screen
+        double tangentPointY = HEIGHT-convertGraphToScreenCoord(Functions.f(derivativePoint), false);
+        double slope = Functions.Derivative(derivativePoint);
+        int tanLength = (int)(500*zoomFactor);
+        g2.setColor(Color.blue);
+        g2.drawLine((int)(tangentPointX-tanLength), (int)(tangentPointY+(tanLength*slope)),(int)(tangentPointX+tanLength), (int)(tangentPointY-(tanLength*slope)));//500 is just tan line length placeholder
+        g2.fillOval((int)tangentPointX-3,(int)(tangentPointY+slope)-3,6,6);//dot on tangent
+        
+        //Draws Tracer
+        g2.setColor(Color.black);
+        double x = convertGraphToScreenCoord(tracePosition.x, true); //graph to screen
+        if (x > 0 && x < WIDTH && showTrace) {
+            g2.drawString("Trace: (" + round(tracePosition.x) + "," + round(Functions.f(tracePosition.x)) + ")",10,10);//wrong use Functions.f    
+            g2.fillOval((int)x-3, (int)tracePosition.y-3, 6, 6);
+        }     
 
-    MouseAdapter ma = new MouseAdapter() {
+        //String avgDisplayText = "Avg Func. Val: " + (int)(Functions.Average(convertScreenToGraphCoords(yCoords))*1000)/1000.0;
+        //g2.drawString(avgDisplayText, WIDTH-avgDisplayText.length()*6, HEIGHT-10);
+    }   
+    public double round(double num) { return (int)(Math.round(num*1000))/1000.0;}
+
+    public MouseAdapter ma = new MouseAdapter() {
         Point startCoords;
 
         @Override
@@ -93,9 +133,9 @@ public class Graph extends JPanel {
         public void mouseWheelMoved(MouseWheelEvent e) {
             //Point cursorPos = e.getPoint();
             zoomFactor = (e.getWheelRotation() > 0) ? zoomFactor/1.1 : zoomFactor*1.1;
-            zoomFactor = (zoomFactor < 0.5) ? 0.5 : zoomFactor; //0.5 cuz interval variable in paint component
-            //distanceDragged.x += (cursorPos.x - offset.x - distanceDragged.x)/zoomFactor*(e.getWheelRotation()/Math.abs(e.getWheelRotation()));
-            //distanceDragged.y -= (cursorPos.y - offset.y - distanceDragged.y)/zoomFactor*(e.getWheelRotation()/Math.abs(e.getWheelRotation()));
+            zoomFactor = (zoomFactor < 1) ? 1 : zoomFactor; //0.5 cuz interval variable in paint component
+            //distanceDragged.x += ((cursorPos.x - offset.x)/zoomFactor)*(e.getWheelRotation()/Math.abs(e.getWheelRotation()));
+            //distanceDragged.y -= ((cursorPos.y - offset.y)/zoomFactor)*(e.getWheelRotation()/Math.abs(e.getWheelRotation()));
             calculateYVals();
         }
     };

@@ -5,43 +5,80 @@ import javax.swing.*;
 
 public class Calculator {
     static JFrame gui;
+    static Graph graph;
     static JTextField derivInput, derivAns;
     static JTextField integralBoundOne, integralBoundTwo, integralAns;
 
-    public static void main(String[] args) { // zoom //  derivative tangent line / arrow button functionality / refactor code (this class)
+    public static void main(String[] args) {//fix tan line / refactor code (document with comments / arrow key class?)
         EventQueue.invokeLater(new Runnable() { //fixes components not loading properly on start
             public void run() {
-                Graph graph = createFrameAndScreen();
-                instantiateCalculusButtons(graph);
+                createFrameAndScreen();
+                instantiateCalculusButtons();
                 instantiateTextFields();
                 instantiateArrowButtons();
-                instantiateFunctionButtons(graph);
+                instantiateFunctionButtons();
             }
         });
     }
+
+    public static void refresh() {
+        integralAns.setText("");
+        integralBoundOne.setText("");
+        integralBoundTwo.setText("");
+        derivAns.setText("");
+        derivInput.setText("");
+        graph.resetScreen();
+    }
+
     public static void instantiateArrowButtons() {
         JButton upArrow = new JButton() {
             {
                 setBounds(178,515,20,30);
                 setBackground(Color.darkGray);
+                addActionListener(new ActionListener() { 
+                    public void actionPerformed(ActionEvent e) {
+                        graph.showTrace = !graph.showTrace;
+                        graph.repaint();
+                    }
+                });
             }
         };
         JButton leftArrow = new JButton() {
             {
                 setBounds(143,550,30,20);
                 setBackground(Color.darkGray);
+                addActionListener(new ActionListener() { 
+                    public void actionPerformed(ActionEvent e) {
+                        if (!graph.showTrace) return;
+                        graph.tracePosition.x-=(Math.PI/24);
+                        graph.calculateYVals();
+                    }
+                });
             }
         };
         JButton rightArrow = new JButton() {
             {
                 setBounds(203,550,30,20);
                 setBackground(Color.darkGray);
+                addActionListener(new ActionListener() { 
+                    public void actionPerformed(ActionEvent e) {  
+                        if (!graph.showTrace) return;
+                        graph.tracePosition.x+=(Math.PI/24);
+                        graph.calculateYVals();
+                    }
+                });
             }
         };
         JButton downArrow = new JButton() {
             {
                 setBounds(178,575,20,30);
                 setBackground(Color.darkGray);
+                addActionListener(new ActionListener() { 
+                    public void actionPerformed(ActionEvent e) {
+                        graph.showTrace = !graph.showTrace;
+                        graph.repaint();
+                    }
+                });
             }
         };
         gui.add(upArrow);
@@ -49,11 +86,11 @@ public class Calculator {
         gui.add(rightArrow);
         gui.add(downArrow);
     }
-    public static Graph createFrameAndScreen() {
+    public static void createFrameAndScreen() {
         gui = new JFrame() {
             {
                 setTitle("Graphing Calculator");
-                setPreferredSize(new Dimension(400,700));//random choice
+                setPreferredSize(new Dimension(400,675));//random choice
                 pack();
                 setLayout(null);
                 setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,53 +98,26 @@ public class Calculator {
                 getContentPane().setBackground(new Color(26,26,26));
             }
         };
-        Graph g = new Graph() {
+        graph = new Graph() {
             {
                 setVisible(true);
                 setBackground(Color.black);
             }
         };
 
-        gui.add(g);
+        gui.add(graph);
         gui.setVisible(true);
-        return g;
     }
-    public static void instantiateFunctionButtons(Graph graph) { // add to loop maybe?
-        JButton[] functionButtons = new JButton[8];
-        String[] names = new String[] {"Line", "Parab", "Sqrt", "Cube", "Cbrt", "Bird", "Rocket", "Sine"};//eventually get this array from Functions class (it'll have one)
-        int yVal = 325;
-        //int amtPerRow = 4;//if dynamic / dont rly need
-        for (int i = 0; i < functionButtons.length; i++) {
-            if (i == 4) yVal += 30;
-            int index = i;
-            functionButtons[index] = new JButton() {
-                {
-                    setText(names[index]);
-                    setBackground(Color.black);        
-                    setForeground(new Color(230, 230, 230));
-                    setFocusPainted(false);                              
-                    
-                    addActionListener(new ActionListener() { 
-                    public void actionPerformed(ActionEvent e) {  
-                        //if (Functions.func.getName().equals(getText())) return;   
-                        if (Functions.function.equals(getText())) return;
-                        Functions.updateFunction(getText());
-                        graph.resetScreen();
-                        clearText();
-                    }    
-                    });
-                }
-            };   
-            functionButtons[i].setBounds(35+80*(i%4),yVal,75,25); 
-            gui.add(functionButtons[i]);
+    public static void instantiateFunctionButtons() {
+        String[] buttonNames = Functions.functionsList;
+        int amtPerRow = 4, yVal = 325;
+
+        for (int i = 0; i < buttonNames.length; i++) {
+            if (i % amtPerRow == 0 && i != 0) yVal += 30;
+            GraphButtons gb = new GraphButtons(buttonNames[i]);
+            gb.setBounds(35+80*(i%4),yVal,75,25); 
+            gui.add(gb);
         }
-    }
-    public static void clearText() {
-        integralAns.setText("");
-        integralBoundOne.setText("");
-        integralBoundTwo.setText("");
-        derivAns.setText("");
-        derivInput.setText("");
     }
     public static void instantiateTextFields() {
         derivInput = new JTextField() {
@@ -149,7 +159,7 @@ public class Calculator {
         gui.add(integralBoundTwo);
         gui.add(integralAns);
     }  
-    public static void instantiateCalculusButtons(Graph graph) {
+    public static void instantiateCalculusButtons() {
         JButton derivButton = new JButton() {
             {
                 setForeground(Color.black);
@@ -168,9 +178,10 @@ public class Calculator {
                 try { x = Double.parseDouble(derivInput.getText()); } 
                 catch (NumberFormatException ex) { x = Double.NaN; }
                 float ans = (float)Functions.Derivative(x);
+                ans = (Math.abs(Math.round(ans) - ans) <= 0.0001) ? (int)Math.round(ans) : ans;
                 derivAns.setText(ans + "");
-                graph.derivativePoint = (int)Math.round(x);
-                //draw tangent line
+                graph.derivativePoint = x;
+                graph.repaint();
             }
         });
         JButton integralButton = new JButton() {
@@ -193,7 +204,9 @@ public class Calculator {
                 try { b = Double.parseDouble(integralBoundTwo.getText()); } 
                 catch (NumberFormatException ex) { b = Double.NaN; }
                 float ans = (float)Functions.Integral(a, b);
+                ans = (Math.abs(Math.round(ans) - ans) <= 0.0001) ? (int)Math.round(ans) : ans;
                 integralAns.setText(ans + "");
+                if (Double.isNaN(ans)) return;
                 graph.riemannRange[0] = (a < b) ? a : b; 
                 graph.riemannRange[1] = (a >= b) ? a : b; 
                 graph.repaint();

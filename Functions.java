@@ -2,21 +2,36 @@ import java.lang.reflect.*;
 public class Functions {
     //public static Method func;
     public static String function = "Line";//maybe make empty at start
-    public static  double f(double x, double xShift, double yShift) {
+    public static String[] functionsList = {"Line", "Parab", "Sqrt", "Cube", "Cbrt", "Bird", "Rocket", "Sine"};
+    // public static double f(double x, double xShift, double yShift) {
+    //     switch (function) {
+    //         case "Line": return (x-xShift) + yShift;
+    //         case "Parab": return  Math.pow(x-xShift, 2) + yShift;
+    //         case "Sqrt":  return Math.sqrt(x-xShift) + yShift;
+    //         case "Cube": return Math.pow(x-xShift, 3) + yShift;
+    //         case "Rocket": return 1/Math.pow(x-xShift, 2) + yShift;
+    //         case "Cbrt": return Math.cbrt(x-xShift) + yShift;
+    //         case "Bird": return Math.pow(Math.cbrt(x-xShift), 2) + yShift;
+    //         case "Sine": return Math.sin((x-xShift)) + yShift;//fix to work with rad view?
+    //         case "NaturalLog": return ((x-xShift) == 0) ? Double.NaN : Math.log(x-xShift) + yShift;
+    //         default: return Double.NaN;
+    //     }
+    // }
+    public static double f(double x) {
         switch (function) {
-            case "Line": return (x-xShift) + yShift;
-            case "Parab": return  Math.pow(x-xShift, 2) + yShift;
-            case "Sqrt":  return Math.sqrt(x-xShift) + yShift;
-            case "Cube": return Math.pow(x-xShift, 3) + yShift;
-            case "Rocket": return 1/Math.pow(x-xShift, 2) + yShift;
-            case "Cbrt": return Math.cbrt(x-xShift) + yShift;
-            case "Bird": return Math.pow(Math.cbrt(x-xShift), 2) + yShift;
-            case "Sine": return Math.sin((x-xShift)) + yShift;//fix to work with rad view?
-            case "NaturalLog": return ((x-xShift) == 0) ? Double.NaN : Math.log(x-xShift) + yShift;
+            case "Line": return x;
+            case "Parab": return  Math.pow(x, 2);
+            case "Sqrt":  return Math.sqrt(x);
+            case "Cube": return Math.pow(x, 3);
+            case "Rocket": return 1/Math.pow(x, 2);
+            case "Cbrt": return Math.cbrt(x);
+            case "Bird": return Math.pow(Math.cbrt(x), 2) ;
+            case "Sine": return Math.sin(x);//fix to work with rad view?
+            case "NaturalLog": return (x == 0) ? Double.NaN : Math.log(x);
             default: return Double.NaN;
         }
     }
-    public static void updateFunction(String newFunction) {
+    public static void updateFunction(String newFunction) { // variable is public tho
         function = newFunction;
     }
     // public static void updateFunction(String funcName) { // sets function
@@ -62,16 +77,23 @@ public class Functions {
     // }
     public static double Derivative(double x) {//poopy butt when x approaches non differentiable point
         double deltaX = 0.0001;
-        return (f(x+deltaX, 0, 0) - f(x, 0, 0))/deltaX;
+        return (f(x+deltaX) - f(x))/deltaX;
     }
     public static double Integral(double a, double b) {
-        //if statement to use simpsons rule if not log based / trig function?
         if (Double.isNaN(a) || Double.isNaN(b)) return Double.NaN;
         if (b < a) return -Integral(b, a);
         double deltaX = 0.00001;
         double ans = 0;
         for (; a < b; a += deltaX)
-            ans += f(a, 0, 0) + f(a + deltaX, 0, 0);
+            ans += f(a) + f(a + deltaX);
         return ans * 0.5 * deltaX;
     }
+    
+    // public static double Average(Integer[] vals) { //average value of displayed segment for APCSP Requirement PUT IN GRAPH CLASS
+    //     double total = 0;
+    //     for (int i = 0; i < vals.length; i++) 
+    //         if (vals[i] != null)
+    //             total += vals[i];
+    //     return total / vals.length;
+    // }
 }
