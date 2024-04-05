@@ -1,7 +1,6 @@
 # Graphic Calculator
-![image](https://github.com/MatthewDRomano/Graphic-Calculator/assets/120230187/6bcfba33-2657-4a8a-b63d-dcb306684316)
-![image](https://github.com/MatthewDRomano/Graphic-Calculator/assets/120230187/e43613fd-3de8-48bd-b208-7636e37987d2)
-
+<img src="https://github.com/MatthewDRomano/Graphic-Calculator/assets/120230187/6bcfba33-2657-4a8a-b63d-dcb306684316" height = "700" width="400">
+<img src="https://github.com/MatthewDRomano/Graphic-Calculator/assets/120230187/e43613fd-3de8-48bd-b208-7636e37987d2" height = "700" width="400">
 
 ## Description
 Simple Calculator that can graph multiple functions and calculate their derivate / Integral at certain points or over a range.
