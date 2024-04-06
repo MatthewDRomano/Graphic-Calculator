@@ -1,7 +1,6 @@
 # Graphic Calculator
-![image](https://github.com/MatthewDRomano/Graphic-Calculator/assets/120230187/e0cb3f64-1459-4a3e-a3ba-59f173b0941a)
-![image](https://github.com/MatthewDRomano/Graphic-Calculator/assets/120230187/202ad2cd-b0bf-4cd8-bf77-d30f10682585)
-
+<img src="https://github.com/MatthewDRomano/Graphic-Calculator/assets/120230187/6bcfba33-2657-4a8a-b63d-dcb306684316" height = "700" width="400">
+<img src="https://github.com/MatthewDRomano/Graphic-Calculator/assets/120230187/e43613fd-3de8-48bd-b208-7636e37987d2" height = "700" width="400">
 
 ## Description
 Simple Calculator that can graph multiple functions and calculate their derivate / Integral at certain points or over a range.
@@ -10,14 +9,14 @@ Simple Calculator that can graph multiple functions and calculate their derivate
 Java - VsCode
 
 ## Features
-- [x] Visual Graph of various functions
+- [x] Visual Graph of various functions (Buttons to switch)
 - [x] Zoom in/out capability
 - [x] Adjustable graphing window via mouse drag
 - [x] Derivate at a point / Definite Integral Calculation
 - [x] Reimann Sum Visual
-- [ ] Derivative Tangent Line 
+- [x] Derivative Tangent Line 
 - [x] Arrow Keys to trace graph
-- [ ] Trig view
+- [ ] Ability to Graph Multiple Functions Simultaneously
 
 ## Controls
 | Key | Function |
