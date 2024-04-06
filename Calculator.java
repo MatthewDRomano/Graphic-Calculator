@@ -9,7 +9,7 @@ public class Calculator {
     static JTextField derivInput, derivAns;
     static JTextField integralBoundOne, integralBoundTwo, integralAns;
 
-    public static void main(String[] args) {//fix tan line / refactor code (document with comments / arrow key class?)
+    public static void main(String[] args) {//deriv at non d'able points / refactor code (document with comments / arrow key class?)
         EventQueue.invokeLater(new Runnable() { //fixes components not loading properly on start
             public void run() {
                 createFrameAndScreen();
@@ -17,6 +17,7 @@ public class Calculator {
                 instantiateTextFields();
                 instantiateArrowButtons();
                 instantiateFunctionButtons();
+
             }
         });
     }
@@ -85,7 +86,42 @@ public class Calculator {
         gui.add(leftArrow);
         gui.add(rightArrow);
         gui.add(downArrow);
+        // JButton[] arrowButtons = new JButton[4];
+        // int[][] bounds = {{178,515,20,30}, {143,550,30,20}, {203,550,30,20}, {178,575,20,30}};
+        // ActionListener[] actions = {
+        //     e -> {
+        //     graph.showTrace = !graph.showTrace;
+        //     graph.repaint();
+        //     },
+        //     e -> {
+        //     if (!graph.showTrace) return;
+        //     graph.tracePosition.x-=(Math.PI/24);
+        //     graph.calculateYVals();
+        //     },
+        //     e -> {
+        //     if (!graph.showTrace) return;
+        //     graph.tracePosition.x+=(Math.PI/24);
+        //     graph.calculateYVals();
+        //     },
+        //     e -> {
+        //     graph.showTrace = !graph.showTrace;
+        //     graph.repaint();
+        //     }
+        // };
+
+        // for (int i = 0; i < arrowButtons.length; i++) {
+        //     int indx = i;
+        //     arrowButtons[i] = new JButton() {
+        //     {
+        //         setBounds(bounds[indx][0], bounds[indx][1], bounds[indx][2], bounds[indx][3]);
+        //         setBackground(Color.darkGray);
+        //         addActionListener(actions[indx]);
+        //     }
+        //     };
+        //     gui.add(arrowButtons[i]);
+        // }
     }
+
     public static void createFrameAndScreen() {
         gui = new JFrame() {
             {
@@ -98,13 +134,7 @@ public class Calculator {
                 getContentPane().setBackground(new Color(26,26,26));
             }
         };
-        graph = new Graph() {
-            {
-                setVisible(true);
-                setBackground(Color.black);
-            }
-        };
-
+        graph = new Graph();
         gui.add(graph);
         gui.setVisible(true);
     }
@@ -206,9 +236,8 @@ public class Calculator {
                 float ans = (float)Functions.Integral(a, b);
                 ans = (Math.abs(Math.round(ans) - ans) <= 0.0001) ? (int)Math.round(ans) : ans;
                 integralAns.setText(ans + "");
-                if (Double.isNaN(ans)) return;
-                graph.riemannRange[0] = (a < b) ? a : b; 
-                graph.riemannRange[1] = (a >= b) ? a : b; 
+                graph.riemannRange[0] = (Double.isNaN(a) || Double.isNaN(b)) ? Double.NaN : (a < b) ? a : b; 
+                graph.riemannRange[1] = (Double.isNaN(a) || Double.isNaN(b)) ? Double.NaN : (a >= b) ? a : b; 
                 graph.repaint();
                 //graph REIMANN DRAWING
             }

@@ -13,9 +13,9 @@ public class GraphButtons extends JButton {
         addActionListener(new ActionListener() { 
             public void actionPerformed(ActionEvent e) {  
                 if (Functions.function.equals(text)) return;
-                Functions.updateFunction(text);
+                Functions.function = text;
                 Calculator.refresh();
-            }    
+            }
         });
     }
 }

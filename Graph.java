@@ -8,7 +8,7 @@ public class Graph extends JPanel {
     private static double zoomFactor; //if window goes from -10 to 10 down to -1 to 1, zoom is x10 AKA / 10   
     private Point offset, distanceDragged;  //  x = 0  is center so offset ensures graph has negative values // drag is distance mouse drags      
     private Integer[] yCoords;
-    public double derivativePoint;
+    public double derivativePoint; // w/ new updates put these in classes/change visibility or overall functions
     public Double[] riemannRange;
     public Point2D.Double tracePosition;
     public boolean showTrace;
@@ -39,11 +39,14 @@ public class Graph extends JPanel {
         else return (isXVal)
             ? (graphCoord*zoomFactor) + offset.x + distanceDragged.x
             : (graphCoord*zoomFactor) + offset.y + distanceDragged.y;
+        //else return (scrnCoord*zoomFactor) + ((isXVal) ? offset.x + distanceDragged.x: offset.y + distanceDragged.y);
+
     }
     public double convertScreenToGraphCoord(int scrnCoord, boolean isXVal) {
         return (isXVal)
-            ? (scrnCoord - offset.x - distanceDragged.x)/zoomFactor
-            : (scrnCoord - offset.y - distanceDragged.y)/zoomFactor;
+           ? (scrnCoord - offset.x - distanceDragged.x)/zoomFactor
+           : (scrnCoord - offset.y - distanceDragged.y)/zoomFactor;
+        //return scrnCoord - ((isXVal) ? offset.x + distanceDragged.x: offset.y + distanceDragged.y) / zoomFactor;
     }
 
     public void calculateYVals() {
@@ -93,9 +96,9 @@ public class Graph extends JPanel {
         double tangentPointX = convertGraphToScreenCoord(derivativePoint, true); // graph to screen
         double tangentPointY = HEIGHT-convertGraphToScreenCoord(Functions.f(derivativePoint), false);
         double slope = Functions.Derivative(derivativePoint);
-        int tanLength = (int)(500*zoomFactor);
+        double tanLength = (500+distanceDragged.x)*zoomFactor; //500 is just base tan line length 
         g2.setColor(Color.blue);
-        g2.drawLine((int)(tangentPointX-tanLength), (int)(tangentPointY+(tanLength*slope)),(int)(tangentPointX+tanLength), (int)(tangentPointY-(tanLength*slope)));//500 is just tan line length placeholder
+        g2.drawLine((int)(tangentPointX-tanLength), (int)(tangentPointY+(tanLength*slope)),(int)(tangentPointX+tanLength), (int)(tangentPointY-(tanLength*slope)));
         g2.fillOval((int)tangentPointX-3,(int)(tangentPointY+slope)-3,6,6);//dot on tangent
         
         //Draws Tracer
@@ -106,9 +109,20 @@ public class Graph extends JPanel {
             g2.fillOval((int)x-3, (int)tracePosition.y-3, 6, 6);
         }     
 
-        //String avgDisplayText = "Avg Func. Val: " + (int)(Functions.Average(convertScreenToGraphCoords(yCoords))*1000)/1000.0;
+        //String avgDisplayText = "Avg Func. Val: " + (int)(Average(yCoords)*1000)/1000.0;
         //g2.drawString(avgDisplayText, WIDTH-avgDisplayText.length()*6, HEIGHT-10);
     }   
+
+    // public double Average(Integer[] vals) { //average value of displayed segment for APCSP Requirement CREATE BOUNDS REQUIREMENTS
+    //     double total = 0;
+    //     for (int i = 0; i < vals.length; i++)
+    //         if (vals[i] != null) {
+    //             double yVal = convertScreenToGraphCoord(vals[i], false);
+    //             total += yVal;
+    //         }
+    //     return total / vals.length;
+    // }
+
     public double round(double num) { return (int)(Math.round(num*1000))/1000.0;}
 
     public MouseAdapter ma = new MouseAdapter() {

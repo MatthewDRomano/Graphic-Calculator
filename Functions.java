@@ -17,10 +17,10 @@ public class Functions {
     //         default: return Double.NaN;
     //     }
     // }
-    public static double f(double x) {
+    public static double f(double x) { // make these return double.NaN if applicable instead of error catch in graph
         switch (function) {
             case "Line": return x;
-            case "Parab": return  Math.pow(x, 2);
+            case "Parab": return Math.pow(x, 2);
             case "Sqrt":  return Math.sqrt(x);
             case "Cube": return Math.pow(x, 3);
             case "Rocket": return 1/Math.pow(x, 2);
@@ -31,9 +31,7 @@ public class Functions {
             default: return Double.NaN;
         }
     }
-    public static void updateFunction(String newFunction) { // variable is public tho
-        function = newFunction;
-    }
+
     // public static void updateFunction(String funcName) { // sets function
     //     try {
     //         func = Functions.class.getMethod(funcName, double.class, double.class, double.class); // Class<?>[] {arg1.class, arg2.class...} works too
@@ -77,6 +75,9 @@ public class Functions {
     // }
     public static double Derivative(double x) {//poopy butt when x approaches non differentiable point
         double deltaX = 0.0001;
+        //double derivLeft = (f(x) - f(x-deltaX))/deltaX;
+        //double derivRight = (f(x+deltaX) - f(x))/deltaX;
+        //return (Math.abs(derivLeft-derivRight) > 1) ? Double.NaN : derivRight;
         return (f(x+deltaX) - f(x))/deltaX;
     }
     public static double Integral(double a, double b) {
@@ -88,12 +89,4 @@ public class Functions {
             ans += f(a) + f(a + deltaX);
         return ans * 0.5 * deltaX;
     }
-    
-    // public static double Average(Integer[] vals) { //average value of displayed segment for APCSP Requirement PUT IN GRAPH CLASS
-    //     double total = 0;
-    //     for (int i = 0; i < vals.length; i++) 
-    //         if (vals[i] != null)
-    //             total += vals[i];
-    //     return total / vals.length;
-    // }
 }
