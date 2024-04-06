@@ -32,94 +32,40 @@ public class Calculator {
     }
 
     public static void instantiateArrowButtons() {
-        JButton upArrow = new JButton() {
-            {
-                setBounds(178,515,20,30);
-                setBackground(Color.darkGray);
-                addActionListener(new ActionListener() { 
-                    public void actionPerformed(ActionEvent e) {
-                        graph.showTrace = !graph.showTrace;
-                        graph.repaint();
-                    }
-                });
+        JButton[] arrowButtons = new JButton[4];
+        int[][] bounds = {{178,515,20,30}, {143,550,30,20}, {203,550,30,20}, {178,575,20,30}};
+        ActionListener[] actions = {
+            e -> {
+            graph.showTrace = !graph.showTrace;
+            graph.repaint();
+            },
+            e -> {
+            if (!graph.showTrace) return;
+            graph.tracePosition.x-=(Math.PI/24);
+            graph.calculateYVals();
+            },
+            e -> {
+            if (!graph.showTrace) return;
+            graph.tracePosition.x+=(Math.PI/24);
+            graph.calculateYVals();
+            },
+            e -> {
+            graph.showTrace = !graph.showTrace;
+            graph.repaint();
             }
         };
-        JButton leftArrow = new JButton() {
-            {
-                setBounds(143,550,30,20);
-                setBackground(Color.darkGray);
-                addActionListener(new ActionListener() { 
-                    public void actionPerformed(ActionEvent e) {
-                        if (!graph.showTrace) return;
-                        graph.tracePosition.x-=(Math.PI/24);
-                        graph.calculateYVals();
-                    }
-                });
-            }
-        };
-        JButton rightArrow = new JButton() {
-            {
-                setBounds(203,550,30,20);
-                setBackground(Color.darkGray);
-                addActionListener(new ActionListener() { 
-                    public void actionPerformed(ActionEvent e) {  
-                        if (!graph.showTrace) return;
-                        graph.tracePosition.x+=(Math.PI/24);
-                        graph.calculateYVals();
-                    }
-                });
-            }
-        };
-        JButton downArrow = new JButton() {
-            {
-                setBounds(178,575,20,30);
-                setBackground(Color.darkGray);
-                addActionListener(new ActionListener() { 
-                    public void actionPerformed(ActionEvent e) {
-                        graph.showTrace = !graph.showTrace;
-                        graph.repaint();
-                    }
-                });
-            }
-        };
-        gui.add(upArrow);
-        gui.add(leftArrow);
-        gui.add(rightArrow);
-        gui.add(downArrow);
-        // JButton[] arrowButtons = new JButton[4];
-        // int[][] bounds = {{178,515,20,30}, {143,550,30,20}, {203,550,30,20}, {178,575,20,30}};
-        // ActionListener[] actions = {
-        //     e -> {
-        //     graph.showTrace = !graph.showTrace;
-        //     graph.repaint();
-        //     },
-        //     e -> {
-        //     if (!graph.showTrace) return;
-        //     graph.tracePosition.x-=(Math.PI/24);
-        //     graph.calculateYVals();
-        //     },
-        //     e -> {
-        //     if (!graph.showTrace) return;
-        //     graph.tracePosition.x+=(Math.PI/24);
-        //     graph.calculateYVals();
-        //     },
-        //     e -> {
-        //     graph.showTrace = !graph.showTrace;
-        //     graph.repaint();
-        //     }
-        // };
 
-        // for (int i = 0; i < arrowButtons.length; i++) {
-        //     int indx = i;
-        //     arrowButtons[i] = new JButton() {
-        //     {
-        //         setBounds(bounds[indx][0], bounds[indx][1], bounds[indx][2], bounds[indx][3]);
-        //         setBackground(Color.darkGray);
-        //         addActionListener(actions[indx]);
-        //     }
-        //     };
-        //     gui.add(arrowButtons[i]);
-        // }
+        for (int i = 0; i < arrowButtons.length; i++) {
+            int indx = i;
+            arrowButtons[i] = new JButton() {
+            {
+                setBounds(bounds[indx][0], bounds[indx][1], bounds[indx][2], bounds[indx][3]);
+                setBackground(Color.darkGray);
+                addActionListener(actions[indx]);
+            }
+            };
+            gui.add(arrowButtons[i]);
+        }
     }
 
     public static void createFrameAndScreen() {
@@ -150,44 +96,26 @@ public class Calculator {
         }
     }
     public static void instantiateTextFields() {
-        derivInput = new JTextField() {
-            {
-                setBounds(155, 400, 75, 25);
-                setForeground(Color.blue);
-            }
-        };
-        derivAns = new JTextField() {
-            {
-                setBounds(265, 400, 85, 25);
-                setEditable(false);
-                setForeground(Color.blue);
-            }
-        };
-        integralBoundOne = new JTextField() {
-            {
-                setBounds(155, 450, 30, 25);
-                setForeground(Color.blue);
-            }
-        };
-        integralBoundTwo = new JTextField() {
-            {
-                setBounds(200, 450, 30, 25);
-                setForeground(Color.blue);
-            }
-        };
-        integralAns = new JTextField() {
-            {
-                setBounds(265, 450, 85, 25);
-                setEditable(false);
-                setForeground(Color.blue);
-            }
-        };
-
-        gui.add(derivInput);
-        gui.add(derivAns);
-        gui.add(integralBoundOne);
-        gui.add(integralBoundTwo);
-        gui.add(integralAns);
+        JTextField[] txtFields = new JTextField[5];
+        int[][] bounds = new int[][] {{155, 400, 75, 25}, {265, 400, 85, 25}, {155, 450, 30, 25}, {200, 450, 30, 25}, {265, 450, 85, 25}};
+        boolean[] editStatus = new boolean[] {true, false, true, true, false};
+        
+        for (int i = 0; i < txtFields.length; i++) {
+            int index = i;
+            txtFields[i] = new JTextField() {
+                {
+                    setBounds(bounds[index][0], bounds[index][1], bounds[index][2], bounds[index][3]);
+                    setEditable(editStatus[index]);
+                    setForeground(Color.blue);
+                }
+            };
+            gui.add(txtFields[i]);
+        }
+        derivInput = txtFields[0];
+        derivAns = txtFields[1];
+        integralBoundOne = txtFields[2];
+        integralBoundTwo = txtFields[3];
+        integralAns = txtFields[4];
     }  
     public static void instantiateCalculusButtons() {
         JButton derivButton = new JButton() {
