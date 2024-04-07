@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
+import java.util.ArrayList; // for eventual use of multiple functions
 
 import javax.swing.*;
 public class Graph extends JPanel {
@@ -105,23 +106,25 @@ public class Graph extends JPanel {
         g2.setColor(Color.black);
         double x = convertGraphToScreenCoord(tracePosition.x, true); //graph to screen
         if (x > 0 && x < WIDTH && showTrace) {
-            g2.drawString("Trace: (" + round(tracePosition.x) + "," + round(Functions.f(tracePosition.x)) + ")",10,10);//wrong use Functions.f    
+            g2.drawString("Trace: (" + round(tracePosition.x) + "," + round(Functions.f(tracePosition.x)) + ")",10,10);  
             g2.fillOval((int)x-3, (int)tracePosition.y-3, 6, 6);
         }     
 
-        //String avgDisplayText = "Avg Func. Val: " + (int)(Average(yCoords)*1000)/1000.0;
-        //g2.drawString(avgDisplayText, WIDTH-avgDisplayText.length()*6, HEIGHT-10);
-    }   
+        //Displays Average Value of Function within graph window
+        String avgDisplayText = "Avg On Screen Val: " + round(Average(yCoords));
+        g2.drawString(avgDisplayText, WIDTH-avgDisplayText.length()*6, HEIGHT-10);
+    }
 
-    // public double Average(Integer[] vals) { //average value of displayed segment for APCSP Requirement CREATE BOUNDS REQUIREMENTS
-    //     double total = 0;
-    //     for (int i = 0; i < vals.length; i++)
-    //         if (vals[i] != null) {
-    //             double yVal = convertScreenToGraphCoord(vals[i], false);
-    //             total += yVal;
-    //         }
-    //     return total / vals.length;
-    // }
+    public double Average(Integer[] vals) { //average value of displayed segment for APCSP Requirement
+        double total = 0, count = 0;
+        for (int i = 0; i < vals.length; i++)
+            if (vals[i] != null && vals[i] > 0 && vals[i] < HEIGHT) {// if val is graphed and withon window bounds (AKA on screen value)
+                double yVal = convertScreenToGraphCoord(vals[i], false);
+                total += yVal;
+                count++;
+            }
+        return total / count;
+    }
 
     public double round(double num) { return (int)(Math.round(num*1000))/1000.0;}
 

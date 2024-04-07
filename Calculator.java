@@ -9,7 +9,7 @@ public class Calculator {
     static JTextField derivInput, derivAns;
     static JTextField integralBoundOne, integralBoundTwo, integralAns;
 
-    public static void main(String[] args) {//deriv at non d'able points / refactor code (document with comments / arrow key class?)
+    public static void main(String[] args) {//deriv at non d'able points / document code w/ comments
         EventQueue.invokeLater(new Runnable() { //fixes components not loading properly on start
             public void run() {
                 createFrameAndScreen();

@@ -12,7 +12,7 @@ public class Functions {
             case "Rocket": return 1/Math.pow(x, 2);
             case "Cbrt": return Math.cbrt(x);
             case "Bird": return Math.pow(Math.cbrt(x), 2) ;
-            case "Sine": return Math.sin(x);//fix to work with rad view?
+            case "Sine": return Math.sin(x);
             case "NaturalLog": return (x == 0) ? Double.NaN : Math.log(x);
             default: return Double.NaN;
         }
