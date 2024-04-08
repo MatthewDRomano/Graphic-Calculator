@@ -99,8 +99,10 @@ public class Graph extends JPanel {
         double slope = Functions.Derivative(derivativePoint);
         double tanLength = (500+distanceDragged.x)*zoomFactor; //500 is just base tan line length 
         g2.setColor(Color.blue);
-        g2.drawLine((int)(tangentPointX-tanLength), (int)(tangentPointY+(tanLength*slope)),(int)(tangentPointX+tanLength), (int)(tangentPointY-(tanLength*slope)));
-        g2.fillOval((int)tangentPointX-3,(int)(tangentPointY+slope)-3,6,6);//dot on tangent
+        if (!Double.isNaN(derivativePoint)) {
+            g2.drawLine((int)(tangentPointX-tanLength), (int)(tangentPointY+(tanLength*slope)),(int)(tangentPointX+tanLength), (int)(tangentPointY-(tanLength*slope)));
+            g2.fillOval((int)tangentPointX-3,(int)(tangentPointY+slope)-3,6,6);//dot on tangent
+        }
         
         //Draws Tracer
         g2.setColor(Color.black);
