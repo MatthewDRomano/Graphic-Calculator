@@ -6,7 +6,7 @@
 Simple Calculator that can graph multiple functions and calculate their derivate / Integral at certain points or over a range.
 
 ## Language
-Java - VsCode
+Java (made with Swing) - VsCode
 
 ## Features
 - [x] Visual Graph of various functions (Buttons to switch)
